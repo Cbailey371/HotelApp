@@ -22,7 +22,7 @@ export const authConfig = {
           password,
         });
 
-        if (!!res.accessToken) {
+        if (res && !!res.accessToken) {
           const userDecodedData = decodeJwt(res.accessToken);
           const allData: any = {
             ...userDecodedData,
