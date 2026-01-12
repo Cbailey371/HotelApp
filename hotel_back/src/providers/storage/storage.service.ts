@@ -16,7 +16,13 @@ export class StorageService {
     this.bucketName =
       this.configService.get<string>('supabase.bucket') || 'uploads';
 
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    if (supabaseUrl && supabaseKey) {
+      this.supabase = createClient(supabaseUrl, supabaseKey);
+    } else {
+      this.logger.warn(
+        'Supabase configuration missing. StorageService will not be able to upload files.',
+      );
+    }
   }
 
   private bufferToStream(buffer: Buffer): Readable {
@@ -30,6 +36,10 @@ export class StorageService {
     file: Express.Multer.File,
   ): Promise<{ url: string; path: string }> {
     try {
+      if (!this.supabase) {
+        this.logger.warn('Storage disabled: Supabase not configured');
+        return { url: '', path: '' };
+      }
       const filePath = `${Date.now()}_${file.originalname}`;
       const { data, error } = await this.supabase.storage
         .from(this.bucketName)
@@ -52,6 +62,7 @@ export class StorageService {
 
   async deleteFile(path: string): Promise<boolean> {
     try {
+      if (!this.supabase) return false;
       const { error } = await this.supabase.storage
         .from(this.bucketName)
         .remove([path]);
