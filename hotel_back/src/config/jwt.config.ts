@@ -1,7 +1,10 @@
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('jwt', () => ({
-  cryptrPhrase: process.env.CRYPTR_PHRASE || 'hotel_secret_key',
+  cryptrPhrase:
+    process.env.CRYPTR_PHRASE ||
+    process.env.JWT_CRYPTR_PHRASE ||
+    'hotel_secret_key',
 
   secret: process.env.JWT_SECRET || 'breakout',
   accessToken: process.env.ACCESS_TOKEN || 'accessToken_breakout',

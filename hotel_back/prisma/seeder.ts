@@ -20,7 +20,9 @@ async function main() {
 
   // 2. Create Users
   const cryptr = new Cryptr(
-    process.env.JWT_CRYPTR_PHRASE || 'hotel_secret_key',
+    process.env.CRYPTR_PHRASE ||
+    process.env.JWT_CRYPTR_PHRASE ||
+    'hotel_secret_key',
   );
   const hashedPassword = cryptr.encrypt('Password123$');
   await prisma.user.createMany({

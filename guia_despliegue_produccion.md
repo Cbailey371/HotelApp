@@ -47,8 +47,12 @@ sudo npm install -g pm2
 ```env
 DATABASE_URL="postgresql://hotel_user:tu_contraseña_segura@localhost:5432/hotel_db_prod?schema=public"
 APP_PORT=4000
-# ... (otras variables de JWT y Supabase)
+APP_URL="https://api.tuservidor.com" # Importante para los enlaces de las imágenes
+# ... (otras variables de JWT)
 ```
+
+### Notas sobre Almacenamiento
+La aplicación ahora guarda las imágenes localmente en la carpeta `hotel_back/uploads`. Asegúrate de que esta carpeta tenga permisos de escritura si es necesario (el backend la creará automáticamente).
 
 ### Construir y Migrar
 ```bash
@@ -67,15 +71,18 @@ pm2 save
 
 ## 3. Despliegue del Frontend (`hotel_front`)
 
-### Configurar e Instalar
-1. Navega a la carpeta desde la raíz: `cd ../hotel_front`.
-2. Instala dependencias: `npm install`.
-3. Crea el archivo `.env.local`:
+### 2. Configurar el archivo `.env.local` del Frontend
+Crea el archivo `.env.local` en la carpeta `hotel_front`:
 ```env
-ROOT_API=http://api.tuservidor.com/api
-AUTH_SECRET=un_secreto_muy_seguro
-NEXT_ENVIROMENT=production
-AUTH_URL=https://tuservidor.com
+ROOT_API=http://maintenpanel.hotelandros.com/api
+AUTH_SECRET=un_secreto_muy_seguro_de_32_caracteres_minimo
+NEXTAUTH_URL=http://maintenpanel.hotelandros.com
+AUTH_TRUST_HOST=true # CRÍTICO: Necesario cuando se usa Nginx y no hay SSL
+```
+
+**Importante**: Reinicia el proceso en PM2 después de cualquier cambio en el `.env.local`:
+```bash
+pm2 restart hotel-frontend
 ```
 
 ### Construir e Iniciar
@@ -92,9 +99,11 @@ pm2 save
 Crea un archivo de configuración en `/etc/nginx/sites-available/hotel`:
 ```nginx
 server {
-    server_name tuservidor.com;
+    listen 80;
+    server_name maintenpanel.hotelandros.com;
 
-    location / {
+    # Importante: Las rutas de autenticación de NextAuth deben ir al Frontend (3000)
+    location /api/auth {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -103,8 +112,19 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
+    # El resto de la API va al Backend (4000)
     location /api {
         proxy_pass http://localhost:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # El Frontend principal
+    location / {
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
