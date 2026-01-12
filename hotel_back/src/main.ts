@@ -1,6 +1,8 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from '@modules/app/app.module';
 import { ConfigService } from '@nestjs/config';
+import * as path from 'path';
 import {
   INestApplication,
   Logger,
@@ -19,8 +21,8 @@ import { ValidationExceptionFilter } from '@filters/validation-exception.filter'
 import { PrismaClientExceptionFilter } from '@providers/prisma/prisma-client-exception.filter';
 import { ThrottlerExceptionsFilter } from '@filters/throttler-exception.filter';
 
-async function bootstrap(): Promise<{ port: number }>  {
-  const app: INestApplication = await NestFactory.create(AppModule, {
+async function bootstrap(): Promise<{ port: number }> {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
     bodyParser: true,
   });
@@ -31,6 +33,10 @@ async function bootstrap(): Promise<{ port: number }>  {
   const appConfig = configService.get('app');
   const swaggerConfig = configService.get('swagger');
   app.setGlobalPrefix('api');
+
+  app.useStaticAssets(path.join(process.cwd(), 'uploads'), {
+    prefix: '/api/v1/uploads/',
+  });
 
   app.enableVersioning({
     type: VersioningType.URI,

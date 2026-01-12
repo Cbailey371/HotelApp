@@ -31,5 +31,6 @@ Thumbs.db
 # Project specific
 hotel_back/.env
 hotel_front/.env.local
+hotel_back/uploads/
 bun.lockb
 package-lock.json
