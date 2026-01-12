@@ -4,6 +4,13 @@ Esta guía detalla los pasos para desplegar la aplicación HotelA en un servidor
 
 ## 1. Preparación del Servidor
 
+### Clonar el Proyecto desde GitHub
+```bash
+cd /var/www
+sudo git clone https://github.com/Cbailey371/HotelApp.git
+cd HotelApp
+```
+
 ### Actualizar el sistema e instalar dependencias básicas
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -33,8 +40,8 @@ sudo npm install -g pm2
 
 ## 2. Despliegue del Backend (`hotel_back`)
 
-### Clonar y configurar
-1. Sube el código al servidor (ej. `/var/www/hotel_back`).
+### Configurar e Instalar
+1. Navega a la carpeta: `cd hotel_back`.
 2. Instala dependencias: `npm install --omit=dev`.
 3. Crea el archivo `.env` basado en `.env.example`:
 ```env
@@ -60,8 +67,8 @@ pm2 save
 
 ## 3. Despliegue del Frontend (`hotel_front`)
 
-### Clonar y configurar
-1. Sube el código al servidor (ej. `/var/www/hotel_front`).
+### Configurar e Instalar
+1. Navega a la carpeta desde la raíz: `cd ../hotel_front`.
 2. Instala dependencias: `npm install`.
 3. Crea el archivo `.env.local`:
 ```env

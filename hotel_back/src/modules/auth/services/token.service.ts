@@ -10,25 +10,25 @@ export class TokenService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
-  ) {}
+  ) { }
 
   createAccessToken(payload: Auth.IPayload) {
     return this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<number>('jwt.jwtExpAccessToken'),
+      expiresIn: this.configService.get<any>('jwt.jwtExpAccessToken'),
       secret: this.configService.get<string>('jwt.accessToken'),
     });
   }
 
   createRefreshToken(payload: Auth.IPayload) {
     return this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<number>('jwt.jwtExpRefreshToken'),
+      expiresIn: this.configService.get<any>('jwt.jwtExpRefreshToken'),
       secret: this.configService.get<string>('jwt.refreshToken'),
     });
   }
 
   sign(payload: Auth.IPayload, expiresIn: string, secret: string) {
     return this.jwtService.sign(payload, {
-      expiresIn,
+      expiresIn: expiresIn as any,
       secret,
     });
   }
