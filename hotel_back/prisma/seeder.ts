@@ -1,5 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import Cryptr from 'cryptr';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Cargar variables de entorno desde el archivo .env
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const prisma = new PrismaClient();
 

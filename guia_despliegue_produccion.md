@@ -102,7 +102,19 @@ server {
     listen 80;
     server_name maintenpanel.hotelandros.com;
 
-    # Importante: Las rutas de autenticación de NextAuth deben ir al Frontend (3000)
+    # 1. Login del Backend (4000) - MUY ESPECÍFICO
+    # Esta ruta debe ir al backend para que el login funcione.
+    location /api/auth/login {
+        proxy_pass http://localhost:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # 2. Rutas de autenticación de NextAuth -> Al Frontend (3000)
+    # Incluye session, csrf, callback, etc.
     location /api/auth {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -112,7 +124,7 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
-    # El resto de la API va al Backend (4000)
+    # 3. El resto de la API va al Backend (4000)
     location /api {
         proxy_pass http://localhost:4000;
         proxy_http_version 1.1;
